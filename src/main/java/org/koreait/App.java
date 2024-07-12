@@ -62,55 +62,91 @@ public class App {
 
         if (cmd.equals("member join")) {
             String loginId = null;
-            String loginpwd = null;
-            String loginName = null;
+            String loginPw = null;
+            String loginPwConfirm = null;
+            String name = null;
+
             System.out.println("==회원가입==");
             while (true) {
-                System.out.print("아이디 :");
-                String id = sc.nextLine();
+                System.out.print("로그인 아이디 : ");
+                loginId = sc.nextLine().trim();
 
-                if (loginId.length() == 0 || loginId.contains("")) {
-                    System.out.println("제입력");
+                if (loginId.length() == 0 || loginId.contains(" ")) {
+                    System.out.println("아이디 제입력");
                     continue;
                 }
+
                 SecSql sql = new SecSql();
 
-                sql.append("SELCT COUNT(8) > 0");
-                sql.append("FROM 'member");
+                sql.append("SELECT COUNT(*) > 0");
+                sql.append("FROM `member`");
                 sql.append("WHERE loginId = ?;", loginId);
 
                 boolean isLoindIdDup = DBUtil.selectRowBooleanValue(conn, sql);
 
                 if (isLoindIdDup) {
-                    System.out.println(LoginId + "는(은) 이미 사용중입니다.");
+                    System.out.println(loginId + "는(은) 이미 사용중입니다");
+                    continue;
+                }
+                break;
+            }
+            while (true) {
+                System.out.print("비밀번호 : ");
+                loginPw = sc.nextLine().trim();
 
+                if (loginPw.length() == 0 || loginPw.contains(" ")) {
+                    System.out.println("다시 입력해 주십시오");
+                    continue;
+                }
+
+                boolean loginPwCheck = true;
+
+                while (true) {
+                    System.out.print("비밀번호 확인 : ");
+                    loginPwConfirm = sc.nextLine().trim();
+
+                    if (loginPwConfirm.length() == 0 || loginPwConfirm.contains(" ")) {
+                        System.out.println("다시 입력해 주십시오");
+                        continue;
+                    }
+                    if (loginPw.equals(loginPwConfirm) == false) {
+                        System.out.println("번호가 일치하지 않습니다.");
+                        loginPwCheck = false;
+                    }
+                    break;
+                }
+                if (loginPwCheck) {
+                    break;
                 }
             }
 
-            System.out.println("패스워드 :");
-            String pwd = sc.nextLine();
-            System.out.println("이름: ");
-            String name = sc.nextLine();
+            while (true) {
+                System.out.print("이름 : ");
+                name = sc.nextLine();
+
+                if (name.length() == 0 || name.contains(" ")) {
+                    System.out.println("다시 입력해 주십시오");
+                    continue;
+                }
+                break;
+            }
+
 
             SecSql sql = new SecSql();
-            sql.append("INSERT INTO Member");
+
+            sql.append("INSERT INTO `member`");
             sql.append("SET regDate = NOW(),");
             sql.append("updateDate = NOW(),");
             sql.append("loginId = ?,", loginId);
-            sql.append("`loginPw`= ?;", pwd);
+            sql.append("loginPw= ?,", loginPw);
             sql.append("name = ?;", name);
 
-            System.out.println(id + "회원이 생성 되었습니다");
+            int id = DBUtil.insert(conn, sql);
 
-            int inserted = DBUtil.insert(conn, sql);
-            if (inserted > 0) {
-                System.out.println("회원가입이 완료되었습니다.");
-            } else {
-                System.out.println("회원가입에 실패하였습니다.");
-            }
-        }
+            System.out.println(id + "번 회원이 생성되었습니다");
 
-        if (cmd.equals("article write")) {
+
+        } else if (cmd.equals("article write")) {
             System.out.println("==글쓰기==");
             System.out.print("제목 : ");
             String title = sc.nextLine();
