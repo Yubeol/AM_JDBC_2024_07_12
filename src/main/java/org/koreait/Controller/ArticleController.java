@@ -1,4 +1,4 @@
-package org.koreait.Controller;
+package org.koreait.controller;
 
 public class ArticleController {
 }
